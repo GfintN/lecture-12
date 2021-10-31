@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="Location">
+            <value>src/main/resources/jdbc.properties</value>
+        </property>
+    </bean>
+
+    <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+        <property name="driverClassName" value="${driverClassName}" />
+        <property name="jdbcUrl" value="${jdbcUrl}" />
+        <property name="username" value="${username}" />
+        <property name="password" value = "${password}" />
+        <property name="maximumPoolSize" value = "${maxPoolSize}" />
+    </bean>
+
+
+    <bean id="hikariDataSource"
+          class="com.zaxxer.hikari.HikariDataSource">
+        <constructor-arg ref="hikariConfig" />
+    </bean>
+
+    <bean id="newDataSource"
+          class="javax.sql.DataSource" destroy-method="close">
+        <constructor-arg ref="hikariDataSource" />
+    </bean>
+
+    <bean id="dbConnection"
+          class="by.it.academy.example.UserInformationJDBC"
+          factory-method="createNewPoolConnection">
+        <property name="dataSource" ref="newDataSource" />
+    </bean>
+
+    <bean id="UpdateCommandSQL"
+          class="by.it.academy.example.CommandsSQL"
+          init-method="setUpdate">
+        <property name="selectTable" value="${updateTableName}" />
+        <property name="selectColumnAndValue" value="${updateColumnNameAndValue}" />
+    </bean>
+
+    <bean id="SelectCommandSQL"
+          class="by.it.academy.example.CommandsSQL"
+          init-method="setSelect">
+        <property name="selectTable" value="${selectTableName}" />
+        <property name="selectColumn" value="${selectColumnName}" />
+    </bean>
+
+    <bean id="InsertCommandSQL"
+          class="by.it.academy.example.CommandsSQL"
+          init-method="setInsert">
+        <property name="selectTable" value="${insertTableName}" />
+        <property name="selectColumnAndValue" value="${insertColumnNameAndValue}" />
+    </bean>
+
+    <bean id="DeleteCommandSQL"
+          class="by.it.academy.example.CommandsSQL"
+          init-method="getDelete">
+        <property name="selectTable" value="${deleteTableName}" />
+        <property name="selectColumnAndValue" value="${deleteColumnNameAndValue}" />
+
+    </bean>
+
+    <bean id="JoinCommandSQL"
+          class="by.it.academy.example.CommandsSQL"
+          init-method="setJoin">
+        <property name="selectTableOne" value="${joinTableOneName}" />
+        <property name="selectTableTwo" value="${joinTableTwoName}" />
+        <property name="columnTableOne" value="${joinColumnTableOneName}" />
+        <property name="columnTableTwo" value="${joinColumnTableTwoName}" />
+    </bean>
+
+    <bean id="TestDaoImplConstructor"
+          class="by.it.academy.example.dao.TestDaoImpl"
+    destroy-method="closeTestDaoConnection">
+        <constructor-arg ref="newDataSource"/>
+    </bean>
+
+    <bean id="TestDaoImplGetRequest"
+          class="by.it.academy.example.dao.TestDaoImpl"
+          factory-method="getPrepareStatement">
+        <property name="sql" value=""/>
+    </bean>
+
+    <bean id="TestDaoImplCloseRequest"
+          class="by.it.academy.example.dao.TestDaoImpl"
+          factory-method="closePrepareStatement">
+        <property name="ps" ref="TestDaoImplGetRequest"/>
+    </bean>
+
+    <bean id="TestDaoImplSave"
+          class="by.it.academy.example.dao.TestDaoImpl"
+          init-method="save">
+        <property name="id" ref="InsertCommandSQL" />
+    </bean>
+
+    <bean id="TestDaoImplGet"
+          class="by.it.academy.example.dao.TestDaoImpl"
+          init-method="get">
+        <property name="id" ref="SelectCommandSQL" />
+    </bean>
+
+    <bean id="TestDaoImplUpdate"
+          class="by.it.academy.example.dao.TestDaoImpl"
+          init-method="update">
+        <property name="id" ref="UpdateCommandSQL" />
+    </bean>
+
+    <bean id="TestDaoImplDelete"
+          class="by.it.academy.example.dao.TestDaoImpl"
+          init-method="delete">
+        <property name="id" ref="DeleteCommandSQL" />
+    </bean>
+
+    <bean id="TestDaoImplGetList"
+          class="by.it.academy.example.dao.TestDaoImpl"
+          init-method="getAllTestDbParameter">
+        <property name="id" ref="SelectCommandSQL" />
+    </bean>
+
+    <bean id="TestDaoImplSave"
+          class="by.it.academy.example.dao.TestDaoImpl"
+          init-method="getOneByTwo">
+        <property name="id" ref="JoinCommandSQL" />
+    </bean>
+
+</beans>

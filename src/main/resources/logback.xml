@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name = "LOG_HOME" value = "src/main/resources/logfiles/" />
+
+    <appender name="FILE-LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/logs.log</file>
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>1</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{dd.MM.yyyy HH:mm:ss.SSS} [%thread] %-5level  %logger{20} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/text.log</file>
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>text.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>1</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{dd.MM.yyyy HH:mm:ss.SSS} TEXT: %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="LOGS" level="TRACE" additivity="false">
+        <appender-ref ref="FILE-LOG"/>
+    </logger>
+    <logger name="TEXT" level="INFO" additivity="false">
+        <appender-ref ref="FILE-OUT"/>
+    </logger>
+
+    <root>
+        <appender-ref ref="FILE-LOG"/>
+        <appender-ref ref="FILE-OUT"/>
+    </root>
+</configuration>
